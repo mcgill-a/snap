@@ -5,4 +5,6 @@ import { Component } from '@angular/core';
   templateUrl: './cards.component.html',
   styleUrls: ['./cards.component.scss'],
 })
-export class CardsComponent {}
+export class CardsComponent {
+  public readonly url = `assets/cards/back_red.svg`;
+}

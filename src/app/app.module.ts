@@ -3,9 +3,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { SnapComponent } from './snap/snap.component';
-import { CardComponent } from './card/card.component';
-import { CardsComponent } from './cards/cards.component';
+import { SnapComponent } from './components/snap/snap.component';
+import { CardComponent } from './components/card/card.component';
+import { CardsComponent } from './components/cards/cards.component';
+import { InlineSVGModule } from 'ng-inline-svg-2';
+import { HttpClientModule } from '@angular/common/http';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: SnapComponent },
@@ -13,7 +15,12 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [AppComponent, SnapComponent, CardComponent, CardsComponent],
-  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    InlineSVGModule,
+    RouterModule.forRoot(routes),
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
