@@ -7,10 +7,17 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Snap, Status, KeyCode } from 'src/app/games/snap';
+import { Snap, StateRef } from 'src/app/games/snap';
 import { Player } from 'src/app/types';
 import { Card } from 'src/app/types/card';
 import { CardComponent } from '../card/card.component';
+
+export enum KeyCode {
+  a = 'KeyA',
+  d = 'KeyD',
+  left = 'ArrowLeft',
+  right = 'ArrowRight',
+}
 
 @Component({
   selector: 'fido-snap',
@@ -20,55 +27,50 @@ import { CardComponent } from '../card/card.component';
 export class SnapComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
-  private _status?: Status;
-
   public get playerOne(): Player {
-    return this.game.playerOne;
+    return this.snap.playerOne;
   }
 
   public get playerTwo(): Player {
-    return this.game.playerTwo;
-  }
-
-  public get status(): Status | undefined {
-    return this._status;
+    return this.snap.playerTwo;
   }
 
   @ViewChild('cards', { read: ViewContainerRef })
   private container!: ViewContainerRef;
 
   @HostListener('window:keydown', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
+  public onKeyUp(event: KeyboardEvent) {
     switch (event.code) {
       case KeyCode.a:
-        this.game.next(this.game.playerOne);
+        this.snap.playerOne.card();
         break;
       case KeyCode.d:
-        this.game.snap(this.game.playerOne);
+        this.snap.playerOne.snap();
         break;
       case KeyCode.left:
-        this.game.next(this.game.playerTwo);
+        this.snap.playerTwo.card();
         break;
       case KeyCode.right:
-        this.game.snap(this.game.playerTwo);
+        this.snap.playerTwo.snap();
         break;
     }
   }
 
-  constructor(private game: Snap) {}
+  constructor(private snap: Snap) {}
 
   ngOnInit(): void {
-    this.game.start();
-
     this.subs.add(
-      this.game.state.subscribe((state) => {
-        this._status = state.status;
-        if (state.card) {
-          this.createCardComponent(state.card);
-        } else {
-          if (state.status !== 'Done') {
+      this.snap.change.subscribe((state) => {
+        switch (state.ref) {
+          case StateRef.CARD:
+            this.createCardComponent(state.card);
+            break;
+          case StateRef.SNAP:
             this.clear();
-          }
+            break;
+          case StateRef.WINNER:
+            this.winner(state.player);
+            break;
         }
       })
     );
@@ -80,6 +82,10 @@ export class SnapComponent implements OnInit, OnDestroy {
 
   private clear(): void {
     this.container?.clear();
+  }
+
+  private winner(player: Player): void {
+    console.warn(`${player.id} wins`);
   }
 
   private createCardComponent(card: Card): void {

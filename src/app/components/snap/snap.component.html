@@ -6,7 +6,7 @@
         <div class="player-cards">
           <fido-cards></fido-cards>
         </div>
-        <span>{{ playerOne.cards }}</span>
+        <span>{{ playerOne.cards.count }}</span>
       </div>
     </div>
     <div class="cards">
@@ -20,12 +20,8 @@
         <div class="player-cards">
           <fido-cards></fido-cards>
         </div>
-        <span>{{ playerTwo.cards }}</span>
+        <span>{{ playerTwo.cards.count }}</span>
       </div>
     </div>
-  </div>
-
-  <div *ngIf="status === 'Done'" class="done">
-    <span>Game Over</span>
   </div>
 </div>

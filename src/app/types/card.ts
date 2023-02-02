@@ -1,5 +1,10 @@
 import { shuffle } from 'lodash';
 
+export interface Card {
+  suit: Suit;
+  value: Value;
+}
+
 type Suit = 'spades' | 'clubs' | 'hearts' | 'diamonds';
 type Value =
   | 2
@@ -15,11 +20,6 @@ type Value =
   | 'queen'
   | 'king'
   | 'ace';
-
-export interface Card {
-  suit: Suit;
-  value: Value;
-}
 
 export function DeckOfCards(): Card[] {
   return shuffle([

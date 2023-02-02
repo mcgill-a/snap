@@ -1,58 +1,31 @@
-import { shuffle } from 'lodash';
-import { Observable, of } from 'rxjs';
-import { Card } from './card';
+import { Subject } from 'rxjs';
+import { Cards } from './cards';
+
+export enum Action {
+  Snap,
+  Card,
+}
 
 export class Player {
-  private _id: string;
-  private _cards: Card[];
-  private _active = false;
+  private _action = new Subject<Action>();
 
-  public get active(): boolean {
-    return this._active;
-  }
-
-  public get cards(): number {
-    return this._cards.length;
-  }
+  public readonly action = this._action.asObservable();
 
   public get id(): string {
     return this._id;
   }
 
-  constructor(id: string) {
-    this._id = id;
-    this._cards = [];
+  public get cards(): Cards {
+    return this._cards;
   }
 
-  public allow(): void {
-    this._active = true;
+  public card(): void {
+    this._action.next(Action.Card);
   }
 
-  public deny(): void {
-    this._active = false;
+  public snap(): void {
+    this._action.next(Action.Snap);
   }
 
-  public getCard(): Observable<Card | undefined> {
-    return of(this._cards.shift());
-  }
-
-  public playCard(): Card | undefined {
-    return this._cards.shift();
-  }
-
-  public removeCards(): void {
-    this._cards = [];
-  }
-
-  public take(card: Card): void {
-    this._cards.push(card);
-  }
-
-  public takeCards(cards: Card[]): void {
-    this._cards = [...this._cards, ...cards];
-  }
-
-  public shuffleCards(): void {
-    this._cards = shuffle(this._cards);
-  }
+  constructor(private _id: string, private _cards: Cards) {}
 }
