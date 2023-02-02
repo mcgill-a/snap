@@ -4,6 +4,7 @@
   background-color: darkolivegreen;
   display: flex;
   justify-content: center;
+  overflow: hidden;
 }
 
 .narrow {
@@ -37,6 +38,7 @@ select {
 .table {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;

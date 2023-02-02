@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, filter, Subscription, merge, map } from 'rxjs';
 import { isNotNullOrUndefined } from '../utils';
 import { Card, DeckOfCards } from '../types/card';
-import { Action, Player } from '../types/player';
+import { Action, Player, PlayerId } from '../types/player';
 import { Cards } from '../types/cards';
 
 interface PlayerAction {
@@ -40,8 +40,8 @@ export enum StateRef {
 export class Snap implements OnDestroy {
   private subs = new Subscription();
   private _pot: Card[];
-  private _playerOne = new Player('Player One', new Cards());
-  private _playerTwo = new Player('Player Two', new Cards());
+  private _playerOne = new Player(PlayerId.One, new Cards());
+  private _playerTwo = new Player(PlayerId.Two, new Cards());
   private _activePlayer: Player;
   private _change = new BehaviorSubject<StateChange | undefined>(void 0);
 

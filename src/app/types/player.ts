@@ -1,6 +1,11 @@
 import { Subject } from 'rxjs';
 import { Cards } from './cards';
 
+export enum PlayerId {
+  'One' = 'Player One',
+  'Two' = 'Player Two',
+}
+
 export enum Action {
   Snap,
   Card,
@@ -11,7 +16,7 @@ export class Player {
 
   public readonly action = this._action.asObservable();
 
-  public get id(): string {
+  public get id(): PlayerId {
     return this._id;
   }
 
@@ -27,5 +32,5 @@ export class Player {
     this._action.next(Action.Snap);
   }
 
-  constructor(private _id: string, private _cards: Cards) {}
+  constructor(private _id: PlayerId, private _cards: Cards) {}
 }

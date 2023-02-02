@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Snap, StateRef } from 'src/app/games/snap';
-import { Player } from 'src/app/types';
+import { Player, PlayerId } from 'src/app/types';
 import { Card } from 'src/app/types/card';
 import { CardComponent } from '../card/card.component';
 
@@ -63,7 +63,7 @@ export class SnapComponent implements OnInit, OnDestroy {
       this.snap.change.subscribe((state) => {
         switch (state.ref) {
           case StateRef.CARD:
-            this.createCardComponent(state.card);
+            this.createCardComponent(state.card, state.player);
             break;
           case StateRef.SNAP:
             this.clear();
@@ -88,9 +88,11 @@ export class SnapComponent implements OnInit, OnDestroy {
     console.warn(`${player.id} wins`);
   }
 
-  private createCardComponent(card: Card): void {
+  private createCardComponent(card: Card, player: Player): void {
     const cardRef = this.container.createComponent(CardComponent);
     cardRef.instance.card = card;
+    cardRef.instance.enterLeft = player.id === PlayerId.One;
+    cardRef.instance.enterRight = player.id === PlayerId.Two;
     const element: HTMLElement = cardRef.location.nativeElement;
     this.rotate(element);
     this.move(element);
