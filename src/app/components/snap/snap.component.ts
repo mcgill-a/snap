@@ -7,8 +7,8 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Snap, StateRef } from 'src/app/games/snap';
-import { Player } from 'src/app/types';
+import { Snap, StateChange, StateRef } from 'src/app/games/snap';
+import { Player, PlayerId } from 'src/app/types';
 import { Card } from 'src/app/types/card';
 import { CardComponent } from '../card/card.component';
 
@@ -19,12 +19,23 @@ export enum KeyCode {
   right = 'ArrowRight',
 }
 
+export enum Animation {
+  'Ready' = 'READY',
+  'EnterLeft' = 'ENTER_LEFT',
+  'EnterRight' = 'ENTER_RIGHT',
+  'ExitLeft' = 'EXIT_LEFT',
+  'ExitRight' = 'EXIT_RIGHT',
+}
+
 @Component({
   selector: 'fido-snap',
   templateUrl: './snap.component.html',
   styleUrls: ['./snap.component.scss'],
 })
 export class SnapComponent implements OnInit, OnDestroy {
+  public readonly ANIMATION_DURATION_MS = 500;
+  public readonly MAX_VISIBLE_CARDS = 8;
+
   private subs = new Subscription();
 
   public get playerOne(): Player {
@@ -37,6 +48,12 @@ export class SnapComponent implements OnInit, OnDestroy {
 
   @ViewChild('cards', { read: ViewContainerRef })
   private container!: ViewContainerRef;
+
+  private _animationState: Animation = Animation.Ready;
+
+  public get animationState(): Animation {
+    return this._animationState;
+  }
 
   @HostListener('window:keydown', ['$event'])
   public onKeyUp(event: KeyboardEvent) {
@@ -60,13 +77,14 @@ export class SnapComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subs.add(
-      this.snap.change.subscribe((state) => {
+      this.snap.changes.subscribe((state) => {
         switch (state.ref) {
           case StateRef.CARD:
-            this.createCardComponent(state.card, state.player);
+            this._animationState = Animation.Ready;
+            this.createCardComponent(state.card);
             break;
           case StateRef.SNAP:
-            this.clear();
+            this.snapped(state);
             break;
           case StateRef.WINNER:
             this.winner(state.player);
@@ -80,20 +98,33 @@ export class SnapComponent implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
-  private clear(): void {
-    this.container?.clear();
+  private snapped(state: StateChange): void {
+    this._animationState =
+      state.player.id === PlayerId.One
+        ? Animation.ExitLeft
+        : Animation.ExitRight;
+    this.snap.block();
+    setTimeout(() => {
+      this.container.clear();
+      this.snap.unblock();
+      this._animationState = Animation.Ready;
+    }, this.ANIMATION_DURATION_MS);
   }
 
   private winner(player: Player): void {
     console.warn(`${player.id} wins`);
   }
 
-  private createCardComponent(card: Card, player: Player): void {
+  private createCardComponent(card: Card): void {
     const cardRef = this.container.createComponent(CardComponent);
     cardRef.instance.card = card;
     const element: HTMLElement = cardRef.location.nativeElement;
     this.rotate(element);
     this.move(element);
+
+    if (this.container.length > this.MAX_VISIBLE_CARDS) {
+      this.container.remove(0);
+    }
   }
 
   private rotate(elem: HTMLElement): void {

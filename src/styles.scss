@@ -19,3 +19,47 @@ router-outlet.flex-layout + * {
   font-family: 'Ubuntu';
   src: url('./assets/Ubuntu-Regular.ttf');
 }
+
+@keyframes enter-left {
+  0% {
+    left: -200px;
+    opacity: 0;
+  }
+  100% {
+    left: 0px;
+    opacity: 1;
+  }
+}
+
+@keyframes exit-left {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  100% {
+    left: -200px;
+    opacity: 0;
+  }
+}
+
+@keyframes enter-right {
+  0% {
+    left: 200px;
+    opacity: 0;
+  }
+  100% {
+    left: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes exit-right {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  100% {
+    left: 200px;
+    opacity: 0;
+  }
+}

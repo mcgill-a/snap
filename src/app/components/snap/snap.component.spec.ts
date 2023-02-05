@@ -27,7 +27,7 @@ describe('SnapComponent', () => {
     snap = {
       playerOne: <Player>playerOne,
       playerTwo: <Player>playerTwo,
-      change: changeSubject.asObservable(),
+      changes: changeSubject.asObservable(),
     };
 
     await TestBed.configureTestingModule({

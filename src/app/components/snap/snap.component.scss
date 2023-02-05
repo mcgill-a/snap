@@ -55,7 +55,10 @@ select {
 .base {
   height: 323.55px;
   width: 222.78px;
-  position: absolute;
+  position: relative;
+
+  animation-duration: 500ms;
+  animation-fill-mode: forwards;
 }
 
 span {
@@ -114,4 +117,19 @@ span {
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
+}
+
+// div {
+//   position: relative;
+//   animation-duration: 500ms;
+//   &.animate {
+//     animation-name: exit-left;
+//   }
+// }
+
+.EXIT_LEFT {
+  animation-name: exit-left;
+}
+.EXIT_RIGHT {
+  animation-name: exit-right;
 }
