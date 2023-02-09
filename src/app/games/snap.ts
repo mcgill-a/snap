@@ -44,20 +44,15 @@ export enum StateRef {
   'WINNER' = 'WINNER',
 }
 
-export enum Blocker {
-  Allow,
-  Deny,
-}
-
 @Injectable({ providedIn: 'root' })
 export class Snap implements OnDestroy {
   private subs = new Subscription();
-  private _pot: Card[];
+  private _changes = new Subject<StateChange>();
   private _playerOne = new Player(PlayerId.One, new Cards());
   private _playerTwo = new Player(PlayerId.Two, new Cards());
   private _activePlayer: Player;
-  private _blocker = new BehaviorSubject<Blocker>(Blocker.Allow);
-  private _changes = new Subject<StateChange>();
+  private _blockActions = new BehaviorSubject<boolean>(false);
+  private _pot: Card[];
 
   public readonly changes = this._changes.asObservable();
 
@@ -70,8 +65,7 @@ export class Snap implements OnDestroy {
   public get activePlayer(): Player {
     return this._activePlayer;
   }
-
-  private get isSnap(): boolean {
+  public get isSnap(): boolean {
     const a = this._pot[this._pot.length - 1];
     const b = this._pot[this._pot.length - 2];
     return !!a && a.value === b?.value;
@@ -82,7 +76,7 @@ export class Snap implements OnDestroy {
     this._pot = [];
     this.init();
 
-    const blocker = this._blocker.pipe(distinctUntilChanged());
+    const blocked = this._blockActions.pipe(distinctUntilChanged());
     const actions = merge(
       this._playerTwo.action.pipe(
         map((action) => <PlayerAction>{ player: this._playerTwo, action })
@@ -92,8 +86,8 @@ export class Snap implements OnDestroy {
       )
     );
 
-    const actionSub = combineLatest([actions, blocker])
-      .pipe(filter(([, blocker]) => blocker === Blocker.Allow))
+    const actionSub = combineLatest([actions, blocked])
+      .pipe(filter(([, blocked]) => !blocked))
       .subscribe(([update]) => {
         switch (update.action) {
           case Action.Card:
@@ -104,6 +98,10 @@ export class Snap implements OnDestroy {
               this._pot.push(card);
               this._changes.next({ ref: StateRef.CARD, player, card });
               this.switchPlayer();
+              if (player.cards.count === 0) {
+                this.noCardsLeft(player);
+                this.block();
+              }
             }
             break;
           case Action.Snap:
@@ -126,11 +124,11 @@ export class Snap implements OnDestroy {
   }
 
   public block(): void {
-    this._blocker.next(Blocker.Deny);
+    this._blockActions.next(true);
   }
 
   public unblock(): void {
-    this._blocker.next(Blocker.Allow);
+    this._blockActions.next(false);
   }
 
   public deal(cards: Card[]): void {
@@ -155,5 +153,12 @@ export class Snap implements OnDestroy {
       this.activePlayer.id === this.playerOne.id
         ? this.playerTwo
         : this.playerOne;
+  }
+
+  private noCardsLeft(player: Player): void {
+    this._changes.next({
+      ref: StateRef.WINNER,
+      player: player.id === PlayerId.One ? this.playerTwo : this.playerOne,
+    });
   }
 }

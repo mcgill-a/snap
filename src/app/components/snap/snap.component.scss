@@ -5,6 +5,8 @@
   display: flex;
   justify-content: center;
   overflow: hidden;
+  padding: 40px;
+  box-sizing: border-box;
 }
 
 .narrow {
@@ -15,6 +17,7 @@
   flex-direction: column;
   overflow: hidden;
   align-items: center;
+  justify-content: space-evenly;
 }
 
 .controls {
@@ -67,20 +70,21 @@ span {
 }
 
 .player {
-  width: 130px;
-  height: 130px;
+  width: 160px;
+  height: 160px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.5);
-  padding: 10px;
+  padding: 20px;
   box-sizing: border-box;
   display: flex;
   gap: 10px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  z-index: 2;
 
   span {
-    font-size: 16px;
+    font-size: 22px;
   }
 
   > div {
@@ -119,13 +123,10 @@ span {
   box-sizing: border-box;
 }
 
-// div {
-//   position: relative;
-//   animation-duration: 500ms;
-//   &.animate {
-//     animation-name: exit-left;
-//   }
-// }
+.announcements {
+  width: 100%;
+  min-height: 160px;
+}
 
 .EXIT_LEFT {
   animation-name: exit-left;

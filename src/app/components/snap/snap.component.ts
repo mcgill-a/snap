@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { Snap, StateChange, StateRef } from 'src/app/games/snap';
 import { Player, PlayerId } from 'src/app/types';
 import { Card } from 'src/app/types/card';
+import { AnnouncementsComponent } from '../announcements/announcements.component';
 import { CardComponent } from '../card/card.component';
 
 export enum KeyCode {
@@ -23,8 +24,8 @@ export enum Animation {
   'Ready' = 'READY',
   'EnterLeft' = 'ENTER_LEFT',
   'EnterRight' = 'ENTER_RIGHT',
-  'ExitLeft' = 'EXIT_LEFT',
-  'ExitRight' = 'EXIT_RIGHT',
+  'GiveToPlayerOne' = 'EXIT_LEFT',
+  'GiveToPlayerTwo' = 'EXIT_RIGHT',
 }
 
 @Component({
@@ -33,7 +34,7 @@ export enum Animation {
   styleUrls: ['./snap.component.scss'],
 })
 export class SnapComponent implements OnInit, OnDestroy {
-  public readonly ANIMATION_DURATION_MS = 500;
+  public readonly ANIMATION_DURATION_MS = 400;
   public readonly MAX_VISIBLE_CARDS = 8;
 
   private subs = new Subscription();
@@ -48,6 +49,9 @@ export class SnapComponent implements OnInit, OnDestroy {
 
   @ViewChild('cards', { read: ViewContainerRef })
   private container!: ViewContainerRef;
+
+  @ViewChild('announcements', { read: ViewContainerRef })
+  private announcements!: ViewContainerRef;
 
   private _animationState: Animation = Animation.Ready;
 
@@ -101,8 +105,8 @@ export class SnapComponent implements OnInit, OnDestroy {
   private snapped(state: StateChange): void {
     this._animationState =
       state.player.id === PlayerId.One
-        ? Animation.ExitLeft
-        : Animation.ExitRight;
+        ? Animation.GiveToPlayerOne
+        : Animation.GiveToPlayerTwo;
     this.snap.block();
     setTimeout(() => {
       this.container.clear();
@@ -112,7 +116,15 @@ export class SnapComponent implements OnInit, OnDestroy {
   }
 
   private winner(player: Player): void {
-    console.warn(`${player.id} wins`);
+    this.announce(`${player.id} wins!`);
+  }
+
+  private announce(text: string): void {
+    this.announcements.clear();
+    const announcementRef = this.announcements.createComponent(
+      AnnouncementsComponent
+    );
+    announcementRef.instance.text = text;
   }
 
   private createCardComponent(card: Card): void {
@@ -128,7 +140,7 @@ export class SnapComponent implements OnInit, OnDestroy {
   }
 
   private rotate(elem: HTMLElement): void {
-    const range = 20;
+    const range = 10;
     const offset = range / 2;
     const rotate = Math.random() * range - offset;
     elem.style.rotate = `${rotate}deg`;
@@ -136,7 +148,7 @@ export class SnapComponent implements OnInit, OnDestroy {
 
   private move(elem: HTMLElement): void {
     elem.style.position = 'absolute';
-    const amount = 15;
+    const amount = 6;
     const offset = amount / 2;
     elem.style.top = `${Math.random() * amount - offset}px`;
     elem.style.left = `${Math.random() * amount - offset}px`;

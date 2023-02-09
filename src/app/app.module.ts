@@ -8,13 +8,20 @@ import { CardsComponent } from './components/cards/cards.component';
 import { InlineSVGModule } from 'ng-inline-svg-2';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AnnouncementsComponent } from './components/announcements/announcements.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: SnapComponent },
 ];
 
 @NgModule({
-  declarations: [AppComponent, SnapComponent, CardComponent, CardsComponent],
+  declarations: [
+    AppComponent,
+    SnapComponent,
+    CardComponent,
+    CardsComponent,
+    AnnouncementsComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
